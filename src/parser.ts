@@ -84,9 +84,7 @@ export class Parser {
             return new LiteralExpr(true);
         if (this.match(TokenType.NIL))
             return new LiteralExpr(null);
-        //console.log("checking num str")
         if (this.match(TokenType.STRING, TokenType.NUMBER)) {
-            //console.log("num/str")
             return new LiteralExpr(this.previous().literal);
         }
         if (this.match(TokenType.LEFT_PAREN)) {
@@ -101,9 +99,6 @@ export class Parser {
 
 
     private match(...types: TokenType[]): boolean {
-        //console.log("Match", types, TokenType.NUMBER)
-        //console.log(types);
-        //types.forEach((type) => {
         for (var type of types) {
             if (this.check(type)) {
                 //console.log("true in match")
@@ -111,15 +106,12 @@ export class Parser {
                 return true;
             }
         }
-        //console.log("false in match")
         return false;
     }
 
     private check(type: TokenType): boolean {
-        //console.log(this.peek().toString())
         if (this.isAtEnd())
             return false;
-        //console.log(this.peek().tokenType, this.peek().tokenType === type)
         return this.peek().tokenType === type;
     }
 

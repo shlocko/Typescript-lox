@@ -1,15 +1,13 @@
-const fs = require('fs');
-const path = require('path');
-const readline = require('readline')
-
-export let HAD_ERROR = false;
-export let HAD_RUNTIME_ERROR = false;
-
-import { AstPrinter } from "./astPrinter";
+import fs from "node:fs";
+import path from "node:path";
 import { Interpreter } from "./interpreter";
 import { Parser } from "./parser";
 import { Scanner } from "./scanner";
 import { Token } from "./token";
+
+export let HAD_ERROR = false;
+export let HAD_RUNTIME_ERROR = false;
+
 
 
 
@@ -18,9 +16,7 @@ const runFile = (scriptName: string) => {
 
     try {
         const fileContents = fs.readFileSync(filePath, 'utf8'); // Read file and store contents in a string
-        //console.log(fileContents);
         console.log("Executing: " + scriptName);
-        //console.log(fileContents.length)
         run(fileContents)
     } catch (err) {
         console.error('An error occurred:', err.message);
@@ -30,10 +26,6 @@ const runFile = (scriptName: string) => {
 }
 
 async function runPrompt() {
-    /*const r = readline.createInterface({
-        input: process.stdin,
-        output: process.stdout
-    });*/
     console.log("Lox: \n > ");
     while (true) {
         for await (const line of console) {
@@ -42,14 +34,11 @@ async function runPrompt() {
             run(line)
         }
     }
-    // TODO
 }
 
 const run = (input: string) => {
     let scanner = new Scanner(input);
-    //console.log(scanner.scanTokens())
     let tokens = scanner.scanTokens();
-    //console.log(tokens)
     let parser = new Parser(tokens);
     let interpreter = new Interpreter();
     let expr = parser.parse();
