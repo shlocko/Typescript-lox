@@ -1,6 +1,6 @@
-import { error } from "./main";
-import { Token } from "./token";
-import { TokenType } from "./tokenType";
+import {report} from "./main";
+import {Token} from "./token";
+import {TokenType} from "./tokenType";
 
 export class Scanner {
     source: string;
@@ -44,6 +44,8 @@ export class Scanner {
     scanToken() {
         let c = this.advance();
         switch (c) {
+            case '?': this.addToken(TokenType.QUESTION); break;
+            case ':': this.addToken(TokenType.COLON); break;
             case '(': this.addToken(TokenType.LEFT_PAREN); break;
             case ')': this.addToken(TokenType.RIGHT_PAREN); break;
             case '{': this.addToken(TokenType.LEFT_BRACE); break;
@@ -81,7 +83,7 @@ export class Scanner {
                 } else if (this.isAlpha(c)) {
                     this.identifier();
                 } else {
-                    error(this.line, "", `Unexpected character: ${c}`);
+                    report(this.line, "", `Unexpected character: ${c}`);
                 }
 
                 break;
@@ -116,7 +118,7 @@ export class Scanner {
         }
 
         if (this.isAtEnd()) {
-            error(this.line, "");
+            report(this.line, "", ": Unterminated string at end of file.");
         }
 
         this.advance();
@@ -166,9 +168,9 @@ export class Scanner {
         return this.isAlpha(c) || this.isCharNumber(c);
     }
 
-    addToken(type: TokenType, literal?: object) {
+    addToken(type: TokenType, literal?: object | string | number) {
         let text: string = this.source.substring(this.start, this.current);
-        this.tokens.push(new Token(type, text, this.line, literal))
+        this.tokens.push(new Token(type, text, this.line, literal));
     }
 
     isAtEnd() {

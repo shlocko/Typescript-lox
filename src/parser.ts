@@ -1,7 +1,7 @@
-import { BinaryExpr, Expr, GroupingExpr, LiteralExpr, UnaryExpr } from "./ast";
-import { error } from "./main";
-import { Token } from "./token";
-import { TokenType } from "./tokenType";
+import {BinaryExpr, Expr, GroupingExpr, LiteralExpr, TernaryExpr, UnaryExpr} from "./ast";
+import {error} from "./main";
+import {Token} from "./token";
+import {TokenType} from "./tokenType";
 
 export class Parser {
     readonly tokens: Token[];
@@ -20,7 +20,21 @@ export class Parser {
     }
 
     private expression(): Expr {
-        return this.equality();
+        return this.ternary();
+    }
+    
+    private ternary(): Expr {
+        let expr: Expr = this.equality();
+        let left;
+        let right;
+        if(this.match(TokenType.QUESTION)){
+            left = this.ternary();
+            if(this.consume(TokenType.COLON, "Expect : in ternary.")){
+                right = this.ternary();
+                expr = new TernaryExpr(expr, left, right);
+            }
+        }
+        return expr;
     }
 
     private equality(): Expr {
@@ -71,7 +85,7 @@ export class Parser {
     private unary(): Expr {
         if (this.match(TokenType.BANG, TokenType.MINUS)) {
             let operator: Token = this.previous();
-            let right: Expr = this.primary();
+            let right: Expr = this.unary();
             return new UnaryExpr(operator, right);
         }
         return this.primary();
@@ -167,3 +181,19 @@ export class Parser {
 
 class ParseError extends Error {
 }
+
+
+// expression ? expression : (expression ? expression : expression)
+
+/*
+expression     → ternary ;
+ternary        → equality ? equality : equality;
+equality       → comparison ( ( "!=" | "==" ) comparison )* ;
+comparison     → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
+term           → factor ( ( "-" | "+" ) factor )* ;
+factor         → unary ( ( "/" | "*" ) unary )* ;
+unary          → ( "!" | "-" ) unary
+               | primary ;
+primary        → NUMBER | STRING | "true" | "false" | "nil"
+               | "(" expression ")" ;
+ */

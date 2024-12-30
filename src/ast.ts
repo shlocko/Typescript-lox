@@ -50,6 +50,20 @@ export class GroupingExpr {
     }
 }
 
+export class TernaryExpr {
+    constructor(condition: Expr, left: Expr, right: Expr){
+        this.condition = condition;
+        this.left = left;
+        this.right = right;
+    }
+    condition: Expr;
+    left: Expr;
+    right: Expr;
+    accept(v: Visitor){
+        return v.visitTernary(this);
+    }
+}
+
 
 
 export interface Visitor {
@@ -58,4 +72,5 @@ export interface Visitor {
     visitUnary(e: UnaryExpr);
     visitLiteral(e: LiteralExpr);
     visitGrouping(e: GroupingExpr);
+    visitTernary(e: TernaryExpr);
 }

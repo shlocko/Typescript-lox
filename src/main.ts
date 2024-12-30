@@ -36,7 +36,7 @@ async function runPrompt() {
     }
 }
 
-const run = (input: string) => {
+export const run = (input: string) => {
     let scanner = new Scanner(input);
     let tokens = scanner.scanTokens();
     let parser = new Parser(tokens);
@@ -45,11 +45,11 @@ const run = (input: string) => {
     if (HAD_ERROR || HAD_RUNTIME_ERROR)
         return;
     if (expr)
-        interpreter.interpret(expr)
+        return interpreter.interpret(expr)
 
 }
 
-const report = (line: number, where: string, message: string) => {
+export const report = (line: number, where: string, message: string) => {
     console.log(`[line ${line}] Error${where}: ${message}`)
 }
 

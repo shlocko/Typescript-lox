@@ -1,4 +1,4 @@
-import { BinaryExpr, Expr, GroupingExpr, LiteralExpr, UnaryExpr, Visitor } from "./ast";
+import {BinaryExpr, Expr, GroupingExpr, LiteralExpr, TernaryExpr, UnaryExpr, Visitor} from "./ast";
 import { RuntimeError } from "./runTimeError";
 import { Token } from "./token";
 import { TokenType } from "./tokenType";
@@ -56,12 +56,23 @@ export class Interpreter implements Visitor {
                 if (typeof left === "number" && typeof right === "number") {
                     return Number(left) + Number(right);
                 }
-                if (typeof left === "string" && typeof right === "string") {
+                if (typeof left === "string" || typeof right === "string") {
                     return String(left) + String(right);
                 }
                 throw new RuntimeError(e.operator, "Operands must be two numbers, or two strings.");
         }
 
+        return null;
+    }
+    visitTernary(e: TernaryExpr){
+        let condition = this.isTruthy(this.evaluate(e.condition));
+        let left = e.left;
+        let right = e.right;
+        if(condition) {
+            return this.evaluate(e.left)
+        }else{
+            return this.evaluate(e.right)
+        }
         return null;
     }
 
@@ -105,8 +116,11 @@ export class Interpreter implements Visitor {
         try {
             let value: object = this.evaluate(expr)
             console.log(this.stringify(value));
+            return value
         } catch (err) {
             console.log(err)
         }
     }
 }
+
+// 1+2+3
