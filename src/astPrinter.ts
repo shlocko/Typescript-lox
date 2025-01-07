@@ -1,8 +1,8 @@
-import { BinaryExpr, Expr, GroupingExpr, LiteralExpr, UnaryExpr, Visitor } from "./ast"
+import { BinaryExpr, Expr, GroupingExpr, LiteralExpr, UnaryExpr, ExprVisitor, TernaryExpr } from "./ast"
 import { Token } from "./token"
 import { TokenType } from "./tokenType"
 
-export class AstPrinter implements Visitor {
+export class AstPrinter implements ExprVisitor {
     visitExpr(e: Expr) {
         return e.accept(this)
     }
@@ -17,6 +17,9 @@ export class AstPrinter implements Visitor {
     }
     visitUnary(e: UnaryExpr) {
         return this.parenthesize(e.operator.lexeme, e.right)
+    }
+    visitTernary(e: TernaryExpr) {
+        return this.parenthesize("ternary", e.condition, e.left, e.right)
     }
     parenthesize(name: string, ...exprs: Expr[]) {
         let str = ""

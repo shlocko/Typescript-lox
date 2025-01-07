@@ -1,7 +1,7 @@
 import { Token } from './token'
 
 export interface Expr {
-    accept(v: Visitor);
+    accept(v: ExprVisitor);
 }
 
 export class BinaryExpr {
@@ -13,7 +13,7 @@ export class BinaryExpr {
     left: Expr;
     operator: Token;
     right: Expr;
-    accept(v: Visitor) {
+    accept(v: ExprVisitor) {
         return v.visitBinary(this)
     }
 }
@@ -25,7 +25,7 @@ export class UnaryExpr {
     }
     operator: Token;
     right: Expr;
-    accept(v: Visitor) {
+    accept(v: ExprVisitor) {
         return v.visitUnary(this)
     }
 }
@@ -35,7 +35,7 @@ export class LiteralExpr {
         this.value = value
     }
     value: any;
-    accept(v: Visitor) {
+    accept(v: ExprVisitor) {
         return v.visitLiteral(this)
     }
 }
@@ -45,13 +45,13 @@ export class GroupingExpr {
         this.expression = expression;
     }
     expression: Expr;
-    accept(v: Visitor) {
+    accept(v: ExprVisitor) {
         return v.visitGrouping(this)
     }
 }
 
 export class TernaryExpr {
-    constructor(condition: Expr, left: Expr, right: Expr){
+    constructor(condition: Expr, left: Expr, right: Expr) {
         this.condition = condition;
         this.left = left;
         this.right = right;
@@ -59,14 +59,14 @@ export class TernaryExpr {
     condition: Expr;
     left: Expr;
     right: Expr;
-    accept(v: Visitor){
+    accept(v: ExprVisitor) {
         return v.visitTernary(this);
     }
 }
 
 
 
-export interface Visitor {
+export interface ExprVisitor {
     //visitExpr(e: Expr);
     visitBinary(e: BinaryExpr);
     visitUnary(e: UnaryExpr);

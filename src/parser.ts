@@ -1,7 +1,8 @@
-import {BinaryExpr, Expr, GroupingExpr, LiteralExpr, TernaryExpr, UnaryExpr} from "./ast";
-import {error} from "./main";
-import {Token} from "./token";
-import {TokenType} from "./tokenType";
+import { BinaryExpr, Expr, GroupingExpr, LiteralExpr, TernaryExpr, UnaryExpr } from "./ast";
+import { error } from "./main";
+import { Expression, Print, Stmt } from "./stmt";
+import { Token } from "./token";
+import { TokenType } from "./tokenType";
 
 export class Parser {
     readonly tokens: Token[];
@@ -11,25 +12,44 @@ export class Parser {
         this.tokens = tokens;
     }
 
-    parse(): Expr | null {
-        try {
-            return this.expression();
-        } catch {
-            return null;
+    parse(): Stmt[] | null {
+        let stmts: Stmt[] = [];
+        while (!this.isAtEnd()) {
+            stmts.push(this.statement());
         }
+        return stmts;
+    }
+
+    statement(): Stmt {
+        if (this.match(TokenType.PRINT)) {
+            return this.printStatement();
+        }
+        return this.expressionStatement();
+    }
+
+    printStatement(): Stmt {
+        let expr = this.expression();
+        this.consume(TokenType.SEMICOLON, "Expect ';' after value.")
+        return new Print(expr)
+    }
+
+    expressionStatement(): Stmt {
+        let expr = this.expression();
+        this.consume(TokenType.SEMICOLON, "Expect ';' after value.")
+        return new Expression(expr);
     }
 
     private expression(): Expr {
         return this.ternary();
     }
-    
+
     private ternary(): Expr {
         let expr: Expr = this.equality();
         let left;
         let right;
-        if(this.match(TokenType.QUESTION)){
+        if (this.match(TokenType.QUESTION)) {
             left = this.ternary();
-            if(this.consume(TokenType.COLON, "Expect : in ternary.")){
+            if (this.consume(TokenType.COLON, "Expect : in ternary.")) {
                 right = this.ternary();
                 expr = new TernaryExpr(expr, left, right);
             }

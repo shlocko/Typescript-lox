@@ -41,11 +41,11 @@ export const run = (input: string) => {
     let tokens = scanner.scanTokens();
     let parser = new Parser(tokens);
     let interpreter = new Interpreter();
-    let expr = parser.parse();
+    let stmts = parser.parse();
     if (HAD_ERROR || HAD_RUNTIME_ERROR)
         return;
-    if (expr)
-        return interpreter.interpret(expr)
+    if (stmts)
+        return interpreter.interpret(stmts)
 
 }
 

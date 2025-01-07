@@ -1,9 +1,18 @@
-import {BinaryExpr, Expr, GroupingExpr, LiteralExpr, TernaryExpr, UnaryExpr, Visitor} from "./ast";
+import { BinaryExpr, Expr, GroupingExpr, LiteralExpr, TernaryExpr, UnaryExpr, ExprVisitor } from "./ast";
 import { RuntimeError } from "./runTimeError";
+import { Expression, Print, Stmt, StmtVisitor } from "./stmt";
 import { Token } from "./token";
 import { TokenType } from "./tokenType";
 
-export class Interpreter implements Visitor {
+export class Interpreter implements ExprVisitor, StmtVisitor {
+    visitPrint(stmt: Print) {
+        console.log(this.stringify(this.evaluate(stmt.expr)))
+        return null;
+    }
+    visitExpression(stmt: Expression) {
+        this.evaluate(stmt.expr);
+        return null;
+    }
     visitLiteral(e: LiteralExpr) {
         return e.value;
     }
@@ -64,14 +73,14 @@ export class Interpreter implements Visitor {
 
         return null;
     }
-    visitTernary(e: TernaryExpr){
+    visitTernary(e: TernaryExpr) {
         let condition = this.isTruthy(this.evaluate(e.condition));
         let left = e.left;
         let right = e.right;
-        if(condition) {
-            return this.evaluate(e.left)
-        }else{
-            return this.evaluate(e.right)
+        if (condition) {
+            return this.evaluate(left)
+        } else {
+            return this.evaluate(right)
         }
         return null;
     }
@@ -112,14 +121,18 @@ export class Interpreter implements Visitor {
         return o
     }
 
-    interpret(expr: Expr) {
+    interpret(stmts: Stmt[]) {
         try {
-            let value: object = this.evaluate(expr)
-            console.log(this.stringify(value));
-            return value
+            for (const stmt of stmts) {
+                this.execute(stmt);
+            }
         } catch (err) {
             console.log(err)
         }
+    }
+
+    execute(stmt: Stmt) {
+        stmt.accept(this);
     }
 }
 
